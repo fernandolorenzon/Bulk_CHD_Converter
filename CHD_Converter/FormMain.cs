@@ -126,8 +126,8 @@ namespace ISO_To_CHD_Converter
         {
             ProcessStartInfo startInfo = new ProcessStartInfo("CMD.exe");
             Process p = new Process();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.CreateNoWindow = true;
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+            startInfo.CreateNoWindow = false;
             startInfo.RedirectStandardInput = true;
             startInfo.UseShellExecute = false;
             startInfo.RedirectStandardOutput = true;
