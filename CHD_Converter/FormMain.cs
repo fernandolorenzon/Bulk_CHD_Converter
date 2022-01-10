@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ISO_To_CHD_Converter
@@ -16,6 +17,7 @@ namespace ISO_To_CHD_Converter
         public FormMain()
         {
             InitializeComponent();
+            comboBoxConditions.SelectedIndex = 0;
         }
 
         private void buttonOpenSourceDir_Click(object sender, EventArgs e)
@@ -42,30 +44,7 @@ namespace ISO_To_CHD_Converter
 
         private void buttonImport_Click(object sender, EventArgs e)
         {
-            if (textBoxSource.Text == "")
-            {
-                MessageBox.Show("Select bin/cue folder first");
-                return;
-            }
-
-            if (!Directory.Exists(textBoxSource.Text))
-            {
-                MessageBox.Show("Invalid bin/cue folder");
-                return;
-            }
-
-            checkedListBoxImages.Items.Clear();
-
-            var searchOptions = checkBoxIncludeSubfolders.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-
-            var files = Directory.GetFiles(textBoxSource.Text, "*.cue", searchOptions);
-
-            checkedListBoxImages.Items.AddRange(files);
-
-            for (int i = 0; i < checkedListBoxImages.Items.Count; i++)
-            {
-                checkedListBoxImages.SetItemChecked(i, true);
-            }
+            Import("", "");
         }
 
         private void buttonConvert_Click(object sender, EventArgs e)
@@ -96,12 +75,21 @@ namespace ISO_To_CHD_Converter
             {
                 var input = item.ToString();
                 var output = textBoxOutput.Text + input.Substring(input.LastIndexOf("\\"));
+
                 output = output.Replace(".cue", ".chd");
+
+                if (File.Exists(output))
+                {
+                    File.Delete(output);
+                }
+
                 var command = "\"" + chdman + "\" createcd -i \"" + input + "\" -o \"" + output + "\"";
 
                 labelCurrent.Text = input.Substring(input.LastIndexOf("\\") + 1);
+                labelCurrent.Refresh();
 
-                ExecuteCMD(command);
+                ExecuteCMD2(command);
+                Thread.Sleep(60 * 1500);
                 count++;
             }
 
@@ -109,37 +97,48 @@ namespace ISO_To_CHD_Converter
             MessageBox.Show(count.ToString() + " Images converted");
         }
 
-        private void Convert(string cuepath, string output)
+        private void ExecuteCMD(string command)
         {
-            var chdman = Environment.CurrentDirectory + "\\" + "chdman.exe";
-            var command = "\"" + chdman + "\" createcd -i \"" + cuepath + "\" -o \"" + output + "\"";
+            //ProcessStartInfo startInfo = new ProcessStartInfo();
+            ////startInfo.CreateNoWindow = true;
+            ////startInfo.UseShellExecute = false;
+            //startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            //startInfo.FileName = "cmd.exe";
+            //startInfo.Arguments = command;
 
-            Process cmd = new Process();
-            cmd.StartInfo.FileName = "cmd.exe";
-            cmd.StartInfo.RedirectStandardInput = true;
-            cmd.StartInfo.RedirectStandardOutput = true;
-            cmd.StartInfo.UseShellExecute = false;
-            cmd.Start();
+            //// Start the process with the info we specified.
+            //// Call WaitForExit and then the using statement will close.
+            //using (Process exeProcess = Process.Start(startInfo))
+            //{
+            //    exeProcess.WaitForExit();
+            //}
 
-            cmd.StandardInput.WriteLine(command);
-            cmd.StandardInput.Flush();
-            cmd.StandardInput.Close();
-            cmd.WaitForExit();
+            Process.Start("cmd.exe", command).WaitForExit();
+
+
+            //ProcessStartInfo cmdsi = new ProcessStartInfo("cmd.exe");
+            //cmdsi.Arguments = command;
+            //Process cmd = Process.Start(cmdsi);
+            //cmd.WaitForExit(); //wait indefinitely for the associated process to exit.
         }
 
-        private void ExecuteCMD(string comm)
+        private void ExecuteCMD2(string comm)
         {
-            Process cmd = new Process();
-            cmd.StartInfo.FileName = "cmd.exe";
-            cmd.StartInfo.RedirectStandardInput = true;
-            cmd.StartInfo.RedirectStandardOutput = true;
-            cmd.StartInfo.UseShellExecute = false;
-            cmd.Start();
+            ProcessStartInfo startInfo = new ProcessStartInfo("CMD.exe");
+            Process p = new Process();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardInput = true;
+            startInfo.UseShellExecute = false;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
 
-            cmd.StandardInput.WriteLine(comm);
-            cmd.StandardInput.Flush();
-            cmd.StandardInput.Close();
-            cmd.WaitForExit();
+            p = Process.Start(startInfo);
+            string changeDir = "cd " + Environment.CurrentDirectory;
+
+            p.StandardInput.WriteLine(changeDir);
+            p.StandardInput.WriteLine(comm);
+            p.StandardInput.WriteLine("exit");
         }
 
         private void checkBoxAll_CheckedChanged(object sender, EventArgs e)
@@ -147,6 +146,66 @@ namespace ISO_To_CHD_Converter
             for (int i = 0; i < checkedListBoxImages.Items.Count; i++)
             {
                 checkedListBoxImages.SetItemChecked(i, checkBoxAll.Checked);
+            }
+        }
+
+        private void buttonFilter_Click(object sender, EventArgs e)
+        {
+            Import(textBoxFilter.Text, comboBoxConditions.Text);
+        }
+
+        private void Import(string filter, string condition)
+        {
+            if (textBoxSource.Text == "")
+            {
+                MessageBox.Show("Select bin/cue folder first");
+                return;
+            }
+
+            if (!Directory.Exists(textBoxSource.Text))
+            {
+                MessageBox.Show("Invalid bin/cue folder");
+                return;
+            }
+
+            checkedListBoxImages.Items.Clear();
+
+            var searchOptions = checkBoxIncludeSubfolders.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+            var files = Directory.GetFiles(textBoxSource.Text, "*.cue", searchOptions);
+            List<string> filtered = new List<string>();
+
+            if (filter != "" && condition != "")
+            {
+                foreach (var file in files)
+                {
+                    var filename = file.Substring(file.LastIndexOf("\\") + 1);
+                    if (condition == "Begins with" && filename.ToLower().StartsWith(filter.ToLower()))
+                    {
+                        filtered.Add(file);
+                    }
+                    else if (condition == "Contains" && filename.ToLower().Contains(filter.ToLower()))
+                    {
+                        filtered.Add(file);
+                    }
+                }
+
+                checkedListBoxImages.Items.AddRange(filtered.ToArray());
+            }
+            else
+            {
+
+                foreach (var file in files)
+                {
+                    filtered.Add(file);
+                }
+
+                checkedListBoxImages.Items.AddRange(filtered.ToArray());
+            }
+
+            for (int i = 0; i < checkedListBoxImages.Items.Count; i++)
+            {
+                checkedListBoxImages.SetItemChecked(i, true);
             }
         }
     }

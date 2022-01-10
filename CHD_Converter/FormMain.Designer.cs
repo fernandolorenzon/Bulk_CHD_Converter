@@ -42,6 +42,9 @@
             this.checkBoxAll = new System.Windows.Forms.CheckBox();
             this.labelCurrent = new System.Windows.Forms.Label();
             this.labelImage = new System.Windows.Forms.Label();
+            this.textBoxFilter = new System.Windows.Forms.TextBox();
+            this.buttonFilter = new System.Windows.Forms.Button();
+            this.comboBoxConditions = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // buttonOpenSourceDir
@@ -183,11 +186,42 @@
             this.labelImage.TabIndex = 12;
             this.labelImage.Text = "Converting:";
             // 
+            // textBoxFilter
+            // 
+            this.textBoxFilter.Location = new System.Drawing.Point(259, 105);
+            this.textBoxFilter.Name = "textBoxFilter";
+            this.textBoxFilter.Size = new System.Drawing.Size(100, 20);
+            this.textBoxFilter.TabIndex = 13;
+            // 
+            // buttonFilter
+            // 
+            this.buttonFilter.Location = new System.Drawing.Point(487, 104);
+            this.buttonFilter.Name = "buttonFilter";
+            this.buttonFilter.Size = new System.Drawing.Size(48, 21);
+            this.buttonFilter.TabIndex = 14;
+            this.buttonFilter.Text = "Filter";
+            this.buttonFilter.UseVisualStyleBackColor = true;
+            this.buttonFilter.Click += new System.EventHandler(this.buttonFilter_Click);
+            // 
+            // comboBoxConditions
+            // 
+            this.comboBoxConditions.FormattingEnabled = true;
+            this.comboBoxConditions.Items.AddRange(new object[] {
+            "Begins with",
+            "Contains"});
+            this.comboBoxConditions.Location = new System.Drawing.Point(365, 104);
+            this.comboBoxConditions.Name = "comboBoxConditions";
+            this.comboBoxConditions.Size = new System.Drawing.Size(108, 21);
+            this.comboBoxConditions.TabIndex = 15;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(611, 561);
+            this.Controls.Add(this.comboBoxConditions);
+            this.Controls.Add(this.buttonFilter);
+            this.Controls.Add(this.textBoxFilter);
             this.Controls.Add(this.labelImage);
             this.Controls.Add(this.labelCurrent);
             this.Controls.Add(this.checkBoxAll);
@@ -224,6 +258,9 @@
         private System.Windows.Forms.CheckBox checkBoxAll;
         private System.Windows.Forms.Label labelCurrent;
         private System.Windows.Forms.Label labelImage;
+        private System.Windows.Forms.TextBox textBoxFilter;
+        private System.Windows.Forms.Button buttonFilter;
+        private System.Windows.Forms.ComboBox comboBoxConditions;
     }
 }
 
