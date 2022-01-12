@@ -49,6 +49,11 @@ namespace ISO_To_CHD_Converter
 
         private void buttonConvert_Click(object sender, EventArgs e)
         {
+            Convert(true);
+        }
+
+        private void Convert(bool convert)
+        {
             if (textBoxOutput.Text == "")
             {
                 MessageBox.Show("Select an output folder first");
@@ -70,6 +75,7 @@ namespace ISO_To_CHD_Converter
             }
 
             int count = 0;
+            StringBuilder sb = new StringBuilder("");
 
             foreach (var item in checkedListBoxImages.CheckedItems)
             {
@@ -78,19 +84,31 @@ namespace ISO_To_CHD_Converter
 
                 output = output.Replace(".cue", ".chd");
 
-                if (File.Exists(output))
-                {
-                    File.Delete(output);
-                }
-
                 var command = "\"" + chdman + "\" createcd -i \"" + input + "\" -o \"" + output + "\"";
 
-                labelCurrent.Text = input.Substring(input.LastIndexOf("\\") + 1);
-                labelCurrent.Refresh();
+                if (convert)
+                {
+                    if (File.Exists(output))
+                    {
+                        File.Delete(output);
+                    }
 
-                ExecuteCMD2(command);
-                Thread.Sleep(60 * 1500);
-                count++;
+                    labelCurrent.Text = input.Substring(input.LastIndexOf("\\") + 1);
+                    labelCurrent.Refresh();
+
+                    ExecuteCMD2(command);
+                    Thread.Sleep(60 * 1500);
+                    count++;
+                }
+                else
+                {
+                    sb.AppendLine(command);
+                }
+            }
+
+            if (!convert)
+            {
+                File.WriteAllText("convert.bat", sb.ToString());
             }
 
             labelCurrent.Text = "Completed";
@@ -126,7 +144,7 @@ namespace ISO_To_CHD_Converter
         {
             ProcessStartInfo startInfo = new ProcessStartInfo("CMD.exe");
             Process p = new Process();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Minimized;
             startInfo.CreateNoWindow = false;
             startInfo.RedirectStandardInput = true;
             startInfo.UseShellExecute = false;
@@ -207,6 +225,11 @@ namespace ISO_To_CHD_Converter
             {
                 checkedListBoxImages.SetItemChecked(i, true);
             }
+        }
+
+        private void buttonGenerateBAT_Click(object sender, EventArgs e)
+        {
+            Convert(false);
         }
     }
 }

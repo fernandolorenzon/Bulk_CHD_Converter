@@ -45,6 +45,7 @@
             this.textBoxFilter = new System.Windows.Forms.TextBox();
             this.buttonFilter = new System.Windows.Forms.Button();
             this.comboBoxConditions = new System.Windows.Forms.ComboBox();
+            this.buttonGenerateBAT = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonOpenSourceDir
@@ -214,11 +215,25 @@
             this.comboBoxConditions.Size = new System.Drawing.Size(108, 21);
             this.comboBoxConditions.TabIndex = 15;
             // 
+            // buttonGenerateBAT
+            // 
+            this.buttonGenerateBAT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonGenerateBAT.Image = ((System.Drawing.Image)(resources.GetObject("buttonGenerateBAT.Image")));
+            this.buttonGenerateBAT.Location = new System.Drawing.Point(138, 500);
+            this.buttonGenerateBAT.Name = "buttonGenerateBAT";
+            this.buttonGenerateBAT.Size = new System.Drawing.Size(117, 49);
+            this.buttonGenerateBAT.TabIndex = 16;
+            this.buttonGenerateBAT.Text = "Generate BAT";
+            this.buttonGenerateBAT.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.buttonGenerateBAT.UseVisualStyleBackColor = true;
+            this.buttonGenerateBAT.Click += new System.EventHandler(this.buttonGenerateBAT_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(611, 561);
+            this.Controls.Add(this.buttonGenerateBAT);
             this.Controls.Add(this.comboBoxConditions);
             this.Controls.Add(this.buttonFilter);
             this.Controls.Add(this.textBoxFilter);
@@ -261,6 +276,7 @@
         private System.Windows.Forms.TextBox textBoxFilter;
         private System.Windows.Forms.Button buttonFilter;
         private System.Windows.Forms.ComboBox comboBoxConditions;
+        private System.Windows.Forms.Button buttonGenerateBAT;
     }
 }
 
